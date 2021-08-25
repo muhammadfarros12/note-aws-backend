@@ -1,3 +1,5 @@
+const ClientError = require("../../exceptions/ClientError");
+
 class NotesHandler{
     constructor (service, validator) {
         this._service = service;
@@ -28,13 +30,26 @@ class NotesHandler{
         response.code(201);
         return response;
     } catch (error) {
+        if(error instanceof ClientError){
         const response = h.response({
             status: 'fail',
-            message: Error.message
+            // sebelumnya ada error di postman yang menjadikannya tidak bisa checking badPayload karena ada error
+            // solve: tulisan Error harusnya error kecil
+            message: error.message
         });
-        response.code(400);
+        response.code(error.statusCode);
         return response;
     }
+
+    // server error
+    const response = h.response({
+        status: 'error',
+        message: 'Maaf. terjadi kegagalan pada server kami',
+    });
+        response.code(500);
+        console.error(error);
+        return response;
+        }
     }
 
     getNotesHandler(){
@@ -58,13 +73,24 @@ class NotesHandler{
             }
         };
     } catch(error) {
+        if(error instanceof ClientError){
         const response = h.response({
             status: 'fail',
             message: error.message,
         });
-        response.code(404);
+        response.code(error.statusCode);
         return response;
     }
+
+    // Server Error
+    const response = h.response({
+        status: 'error',
+        message: 'Maaf, terjadi kegagalan pada server kami.'
+    });
+        response.code(500);
+        console.error(error);
+        return response;
+        }
     }
 
     putNoteByIdHandler(request, h) {
@@ -80,12 +106,23 @@ class NotesHandler{
             message: 'Catatan berhasil diperbarui',
         };
         } catch (error) {
-        const response = h.response({
-            status: 'fail',
-            message: error.message,
-        });
-        response.code(404);
-        return response;
+            if(error instanceof ClientError){
+                const response = h.response({
+                    status: 'fail',
+                    message: error.message,
+                });
+                response.code(error.statusCode);
+                return response;
+            }
+        
+            // Server Error
+            const response = h.response({
+                status: 'error',
+                message: 'Maaf, terjadi kegagalan pada server kami.'
+            });
+            response.code(500);
+            console.error(error);
+            return response;
         }
     }
 
@@ -101,11 +138,22 @@ class NotesHandler{
                 message: 'Catatan berhasil dihapus',
             };
         }catch (error) {
+            if(error instanceof ClientError){
+                const response = h.response({
+                    status: 'fail',
+                    message: error.message,
+                });
+                response.code(error.statusCode);
+                return response;
+            }
+        
+            // Server Error
             const response = h.response({
-                status: 'fail',
-                message: 'Catatan gagal dihapus. Id tidak ditemukan'
+                status: 'error',
+                message: 'Maaf, terjadi kegagalan pada server kami.'
             });
-            response.code(404);
+            response.code(500);
+            console.error(error);
             return response;
         }
     }
