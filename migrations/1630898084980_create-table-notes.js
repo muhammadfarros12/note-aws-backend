@@ -1,8 +1,5 @@
 /* eslint-disable camelcase */
 
-
-exports.shorthands = undefined;
-
 exports.up = pgm => {
     pgm.createTable('notes',{
         id: {
@@ -25,7 +22,7 @@ exports.up = pgm => {
             type: 'TEXT',
             notNull: true,
         },
-        update_at: {
+        updated_at: {
             type: 'TEXT',
             notNull: true,
         }
