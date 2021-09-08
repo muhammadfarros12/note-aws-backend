@@ -1,4 +1,4 @@
-const InvarianError = require("../../exceptions/InvarianError");
+const InvariantError = require("../../exceptions/InvariantError");
 const { NotePayloadSchema } = require("./schema");
 
 const NotesValidator = {
@@ -7,7 +7,7 @@ const NotesValidator = {
         if(validationResult.error) {
             // diubah juga
             //throw new Error(validationResult.error.message);
-            throw new InvarianError(validationResult.error.message);
+            throw new InvariantError(validationResult.error.message);
         }
     },
 };

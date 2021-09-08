@@ -1,8 +1,9 @@
 const { nanoid } = require('nanoid');
 const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
-const InvariantError = require('../../exceptions/InvarianError');
+const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
+const AuthenticationError = require('../../exceptions/AuthenticationError');
 
 class UsersService {
     constructor(){
@@ -56,6 +57,29 @@ class UsersService {
         }
 
         return result.rows[0];
+    }
+
+    // kode untuk cek credential user- dibuat setelah AuthenticationsService
+    async verifyNewCredential(username, password){
+        const query = {
+            text: 'SELECT id, password, FROM users WHERE username = $1',
+            values: [username],
+        };
+        const result = await this._pool.query(query);
+
+        if (!result.rowCount) {
+            throw new AuthenticationError('Kredensial yang Anda berikan salah');
+        }
+        // (jika result.rows.length tidak kosong), dapatkan id dan password dari result.rows[0].
+        const { id, password: hashedPassword } = result.rows[0];
+
+        // kita komparasi nilai hashedPassword dengan password yang ada di parameter. dengan bantuan bcrypt
+        const match = await bcrypt.compare(password, hashedPassword);
+
+        if (!match) {
+            throw new AuthenticationError('Kredensial yang Anda berikan salah');
+        }
+        return id;
     }
 
 }
