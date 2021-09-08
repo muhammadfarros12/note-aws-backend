@@ -2,10 +2,12 @@
 require('dotenv').config();
 
 const Hapi = require('@hapi/hapi');
-const notes = require('./api/notes');
+const Jwt = require('@hapi/jwt');
 // kita ganti dengan yg baru dikarenakan kita langsung menggunakan database tanpa memori note
 //const NotesService = require('./services/inMemory/NotesService');
 // notes
+
+const notes = require('./api/notes');
 const NotesService = require('./services/postgres/NotesService');
 const NotesValidator = require('./validator/notes');
 
@@ -35,6 +37,30 @@ const init = async () => {
       },
     },
   });
+
+  // registrasi plugin eksternal
+  await server.register([
+    {
+      plugin: Jwt,
+    },
+  ]);
+
+  // mendefinisikan strategy autentikasi jwt
+  server.auth.strategy('notesapp_jwt', 'jwt', {
+    keys: process.env.ACCESS_TOKEN_KEY,
+    verify: {
+      aud: false,
+      iss: false,
+      sub: false,
+      maxAgeSec: process.env.ACCESS_TOKEN_AGE,
+    },
+    validate: (artifacts) => ({
+      isValid: true,
+      credentials: {
+        id: artifacts.decoded.payload.id,
+      }
+    })
+  })
 
   await server.register([
       {
