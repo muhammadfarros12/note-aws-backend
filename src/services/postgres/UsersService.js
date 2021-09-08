@@ -62,7 +62,7 @@ class UsersService {
     // kode untuk cek credential user- dibuat setelah AuthenticationsService
     async verifyUserCredential(username, password){
         const query = {
-            text: 'SELECT id, password, FROM users WHERE username = $1',
+            text: 'SELECT id, password FROM users WHERE username = $1',
             values: [username],
         };
         const result = await this._pool.query(query);
