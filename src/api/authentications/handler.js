@@ -41,7 +41,7 @@ class AuthenticationsHandler {
                     status: 'fail',
                     message: error.message,
                 });
-                return response.conde(error.statusCode);
+                return response.code(error.statusCode);
             }
 
             // server Error
@@ -79,7 +79,7 @@ class AuthenticationsHandler {
                     status: 'fail',
                     message: error.message,
                 });
-                return response.conde(error.statusCode);
+                return response.code(error.statusCode);
             }
 
             // server Error
@@ -112,7 +112,7 @@ class AuthenticationsHandler {
                     status: 'fail',
                     message: error.message,
                 });
-                return response.conde(error.statusCode);
+                return response.code(error.statusCode);
             }
 
             // server Error

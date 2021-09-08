@@ -52,7 +52,7 @@ const init = async () => {
       },
     },
     {
-      Plugin: authentications,
+      plugin: authentications,
       options: {
         authenticationsService,
         usersService,
