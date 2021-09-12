@@ -1,3 +1,5 @@
+const ClientError = require("../../exceptions/ClientError");
+
 class CollaborationsHandler {
     constructor(collaborationsService, notesService, validator) {
         this._collaborationsService = collaborationsService;
@@ -12,10 +14,10 @@ class CollaborationsHandler {
     async postCollaborationHandler(request, h) {
         try {
             this._validator.validateCollaborationPayload(request.payload);
-            const { id: creadentialId } = request.auth.credentials;
+            const { id: credentialId } = request.auth.credentials;
             const { noteId, userId } = request.payload;
 
-            await this._notesService.verifyNoteOwner(noteId, creadentialId);
+            await this._notesService.verifyNoteOwner(noteId, credentialId);
 
             const collaborationId = await this._collaborationsService.addCollaboration(noteId, userId);
 
@@ -30,12 +32,12 @@ class CollaborationsHandler {
 
         } catch (error) {
             if (error instanceof ClientError) {
-                const response = ({
+                const response = h.response({
                     status: 'fail',
                     message: error.message
                 });
-
-                return response.code(error.statusCode);
+                response.code(error.statusCode);
+                return response;
             }
 
             // jika server Error
@@ -60,20 +62,20 @@ class CollaborationsHandler {
             await this._notesService.verifyNoteOwner(noteId, creadentialId);
             await this._collaborationsService.deleteCollaboration(noteId, userId);
 
-            const response = h.response({
+            return {
                 status: 'success',
                 message: 'Kolaborasi berhasil dihapus',
-            });
-            return response.code(201);
+            };
 
         } catch (error) {
             if (error instanceof ClientError) {
                 const response = ({
                     status: 'fail',
-                    message: error.message
+                    message: error.message,
                 });
 
-                return response.code(error.statusCode);
+                response.code(error.statusCode);
+                return response;
             }
 
             // jika server Error
